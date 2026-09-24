@@ -6,7 +6,7 @@
 
 1. أنشئ مشروعاً من Firebase Console وأضف Web App.
 2. فعّل **Authentication > Email/Password** وأنشئ حساب المدير.
-3. أنشئ **Cloud Firestore** وفعّل **Storage**.
+3. أنشئ **Cloud Firestore**. الصور تُضاف كرابط مباشر ولا تحتاج إلى Storage.
 4. انسخ إعدادات التطبيق إلى `firebase-config.js`.
 5. استخدم مجموعة Firestore باسم `articles`.
 
@@ -23,22 +23,6 @@ service cloud.firestore {
     match /articles/{article} {
       allow read: if resource.data.status == 'published' || isAdmin();
       allow write: if isAdmin();
-    }
-  }
-}
-```
-
-### قواعد Storage مقترحة
-
-```text
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null
-        && request.resource.size < 10 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
     }
   }
 }

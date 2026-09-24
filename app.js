@@ -20,10 +20,10 @@ async function loadArticles(){
   if(!isFirebaseConfigured){articles=demoArticles;renderAll();return;}
   try{
     const {initializeApp}=await import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js");
-    const {getFirestore,collection,getDocs,query,where,orderBy}=await import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js");
+    const {getFirestore,collection,getDocs,query,where}=await import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js");
     const db=getFirestore(initializeApp(firebaseConfig));
-    const snap=await getDocs(query(collection(db,"articles"),where("status","==","published"),orderBy("date","desc")));
-    articles=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const snap=await getDocs(query(collection(db,"articles"),where("status","==","published")));
+    articles=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     if(!articles.length) articles=demoArticles;
   }catch(error){console.warn("تعذّر الاتصال بـ Firebase، تم تشغيل الوضع التجريبي.",error);articles=demoArticles;}
   renderAll();
