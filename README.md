@@ -6,7 +6,7 @@
 
 1. أنشئ مشروعاً من Firebase Console وأضف Web App.
 2. فعّل **Authentication > Email/Password** وأنشئ حساب المدير.
-3. أنشئ **Cloud Firestore**. الصور تُضاف كرابط مباشر ولا تحتاج إلى Storage.
+3. أنشئ **Cloud Firestore** وفعّل **Storage**.
 4. انسخ إعدادات التطبيق إلى `firebase-config.js`.
 5. استخدم مجموعة Firestore باسم `articles`.
 
@@ -29,3 +29,5 @@ service cloud.firestore {
 ```
 
 قبل إدخال إعدادات Firebase، تعمل لوحة الإدارة في وضع تجريبي وتخزن الأخبار داخل المتصفح فقط.
+
+تُضغط الصور تلقائيًا إلى WebP قبل رفعها. انشر محتوى `storage.rules` في تبويب Storage Rules لحصر الرفع بحساب المدير.
