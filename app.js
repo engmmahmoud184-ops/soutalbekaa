@@ -18,16 +18,20 @@ const youtubeEmbed = url => { if(!url) return ""; const match=url.match(/(?:yout
 
 async function loadArticles(){
   if(!isFirebaseConfigured){articles=demoArticles;renderAll();return;}
+  let db;
   try{
     const {initializeApp}=await import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js");
     const {getFirestore,collection,getDocs,query,where}=await import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js");
-    const db=getFirestore(initializeApp(firebaseConfig));
+    db=getFirestore(initializeApp(firebaseConfig));
     const snap=await getDocs(query(collection(db,"articles"),where("status","==","published")));
     articles=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     if(!articles.length) articles=demoArticles;
   }catch(error){console.warn("تعذّر الاتصال بـ Firebase، تم تشغيل الوضع التجريبي.",error);articles=demoArticles;}
   renderAll();
+  if(db) loadHeaderAd(db);
 }
+
+async function loadHeaderAd(db){try{const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js");const snap=await getDoc(doc(db,"ads","header"));if(!snap.exists())return;const ad=snap.data();if(!ad.active||!ad.image)return;const host=$("#headerAd");const link=document.createElement("a");link.href=ad.link||"#";link.target="_blank";link.rel="noopener noreferrer sponsored";link.setAttribute("aria-label",ad.name?`إعلان ${ad.name}`:"إعلان");const img=document.createElement("img");img.src=ad.image;img.alt=ad.name||"إعلان";link.append(img);host.replaceChildren(link);host.classList.add("has-ad")}catch(error){console.warn("تعذّر تحميل الإعلان.",error)}}
 
 function renderAll(){renderTicker();renderHero();renderNews(articles);renderMostRead();renderVideos();renderAuthors();}
 function renderTicker(){const items=articles.filter(a=>a.breaking).concat(articles.slice(0,3));$("#tickerContent").innerHTML=items.map(a=>`<span>${safe(a.title)}</span>`).join("");}
