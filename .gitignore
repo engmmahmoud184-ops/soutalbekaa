@@ -1,0 +1,16 @@
+# Local development files
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+
+# Firebase local/cache files
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Dependencies and generated output
+node_modules/
+dist/
