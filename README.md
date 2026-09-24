@@ -18,7 +18,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function isAdmin() {
       return request.auth != null
-        && request.auth.uid == 'AmzflPq0vHhxONDSp8gyKzvyMIf1';
+        && request.auth.uid == 'ECiZzHnenFgxDMQicR0bgFZRPw03';
     }
     match /articles/{article} {
       allow read: if resource.data.status == 'published' || isAdmin();
