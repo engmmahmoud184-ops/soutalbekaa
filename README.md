@@ -16,9 +16,13 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.uid == 'AmzflPq0vHhxONDSp8gyKzvyMIf1';
+    }
     match /articles/{article} {
-      allow read: if resource.data.status == 'published' || request.auth != null;
-      allow write: if request.auth != null;
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
     }
   }
 }
