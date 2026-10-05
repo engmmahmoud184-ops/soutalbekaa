@@ -11,6 +11,7 @@ const demoArticles = [
 ];
 
 let articles = [];
+let tickerTimer;
 const $ = selector => document.querySelector(selector);
 const formatDate = value => new Intl.DateTimeFormat("ar-LB",{day:"numeric",month:"long",year:"numeric"}).format(new Date(value));
 const safe = value => String(value ?? "").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
@@ -40,6 +41,10 @@ function renderTicker(){
   const group=items.map(a=>`<button class="ticker-item" data-id="${safe(a.id)}" type="button">${safe(a.title)}</button>`).join("");
   const duplicate=items.map(a=>`<button class="ticker-item" data-id="${safe(a.id)}" type="button" tabindex="-1">${safe(a.title)}</button>`).join("");
   $("#tickerContent").innerHTML=`<div class="ticker-group">${group}</div><div class="ticker-group" aria-hidden="true">${duplicate}</div>`;
+  clearInterval(tickerTimer);
+  const mobileItems=[...document.querySelectorAll(".ticker-group:first-child .ticker-item")];
+  mobileItems[0]?.classList.add("active");
+  if(mobileItems.length>1){let index=0;tickerTimer=setInterval(()=>{mobileItems[index].classList.remove("active");index=(index+1)%mobileItems.length;mobileItems[index].classList.add("active")},4500)}
 }
 function renderHero(){const featured=articles.filter(a=>a.featured).slice(0,3);const picks=featured.length>=3?featured:articles.slice(0,3);$("#heroGrid").innerHTML=picks.map((a,i)=>`<article class="hero-story" data-id="${a.id}" tabindex="0"><img src="${safe(a.image||fallbackImage)}" alt=""><div class="hero-copy"><span class="category">${safe(a.category)}</span><${i===0?"h1":"h2"}>${safe(a.title)}</${i===0?"h1":"h2"}><div class="meta">${formatDate(a.date)} · ${safe(a.author)}</div></div></article>`).join("");bindCards();}
 function card(a){return `<article class="news-card" data-id="${a.id}" tabindex="0"><div class="news-image"><img src="${safe(a.image||fallbackImage)}" alt=""><span class="category">${safe(a.category)}</span>${a.videoUrl?'<span class="play-badge">▶</span>':""}${a.gallery?.length?`<span class="gallery-badge">▣ ${a.gallery.length} صور</span>`:""}</div><div class="news-body"><h3>${safe(a.title)}</h3><p>${safe(a.excerpt)}</p><div class="card-meta"><span>${formatDate(a.date)}</span><span>◉ ${Number(a.views||0).toLocaleString("ar-LB")}</span></div></div></article>`;}
