@@ -34,7 +34,13 @@ async function loadArticles(){
 async function loadHeaderAd(db){try{const {doc,getDoc}=await import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js");const snap=await getDoc(doc(db,"ads","header"));if(!snap.exists())return;const ad=snap.data();if(!ad.active||!ad.image)return;const host=$("#headerAd");const link=document.createElement("a");link.href=ad.link||"#";link.target="_blank";link.rel="noopener noreferrer sponsored";link.setAttribute("aria-label",ad.name?`إعلان ${ad.name}`:"إعلان");const img=document.createElement("img");img.src=ad.image;img.alt=ad.name||"إعلان";link.append(img);host.replaceChildren(link);host.classList.add("has-ad")}catch(error){console.warn("تعذّر تحميل الإعلان.",error)}}
 
 function renderAll(){renderTicker();renderHero();renderNews(articles);renderMostRead();renderVideos();renderAuthors();}
-function renderTicker(){const items=articles.filter(a=>a.breaking).concat(articles.slice(0,3));$("#tickerContent").innerHTML=items.map(a=>`<span>${safe(a.title)}</span>`).join("");}
+function renderTicker(){
+  const breaking=articles.filter(a=>a.breaking);
+  const items=breaking.length?breaking:articles.slice(0,3);
+  const group=items.map(a=>`<button class="ticker-item" data-id="${safe(a.id)}" type="button">${safe(a.title)}</button>`).join("");
+  const duplicate=items.map(a=>`<button class="ticker-item" data-id="${safe(a.id)}" type="button" tabindex="-1">${safe(a.title)}</button>`).join("");
+  $("#tickerContent").innerHTML=`<div class="ticker-group">${group}</div><div class="ticker-group" aria-hidden="true">${duplicate}</div>`;
+}
 function renderHero(){const featured=articles.filter(a=>a.featured).slice(0,3);const picks=featured.length>=3?featured:articles.slice(0,3);$("#heroGrid").innerHTML=picks.map((a,i)=>`<article class="hero-story" data-id="${a.id}" tabindex="0"><img src="${safe(a.image||fallbackImage)}" alt=""><div class="hero-copy"><span class="category">${safe(a.category)}</span><${i===0?"h1":"h2"}>${safe(a.title)}</${i===0?"h1":"h2"}><div class="meta">${formatDate(a.date)} · ${safe(a.author)}</div></div></article>`).join("");bindCards();}
 function card(a){return `<article class="news-card" data-id="${a.id}" tabindex="0"><div class="news-image"><img src="${safe(a.image||fallbackImage)}" alt=""><span class="category">${safe(a.category)}</span>${a.videoUrl?'<span class="play-badge">▶</span>':""}${a.gallery?.length?`<span class="gallery-badge">▣ ${a.gallery.length} صور</span>`:""}</div><div class="news-body"><h3>${safe(a.title)}</h3><p>${safe(a.excerpt)}</p><div class="card-meta"><span>${formatDate(a.date)}</span><span>◉ ${Number(a.views||0).toLocaleString("ar-LB")}</span></div></div></article>`;}
 function renderNews(list){$("#newsGrid").innerHTML=list.map(card).join("");$("#emptyState").hidden=!!list.length;bindCards();}
